@@ -1,40 +1,24 @@
-# =========================
-# Rust / Cargo 相关
-# =========================
-/target/             # 编译产物
-**/*.rs.bk           # rustfmt 备份文件
-**/*.rlib            # Rust 库文件
-Cargo.lock           # 如果是库项目可以忽略（可选）
-*.pdb                # Windows 调试文件
+# Rust / Cargo
+**/target/
 
-# =========================
-# Node / Vite / 前端相关
-# =========================
-node_modules/        # 依赖包缓存
-dist/                # Vite build 输出
-.cache/              # Vite / 构建工具缓存
-*.local              # 本地配置文件（如 vite.config.local.ts）
-pnpm-lock.yaml       # 依赖锁文件（根据需要忽略）
-package-lock.json
-yarn.lock
+# Node / Vite
+**/node_modules/
+**/dist/
+**/.cache/
 
-# =========================
-# 系统 / 编辑器缓存
-# =========================
-.DS_Store            # macOS Finder 缓存
-Thumbs.db            # Windows 缩略图缓存
-*.log                # 日志文件
-*.tmp                # 临时文件
-*.swp                # Vim 交换文件
-*.swo                # Vim 临时文件
-.idea/               # JetBrains IDE 配置
-.vscode/             # VSCode 配置（如果不想上传）
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+.idea/
+.vscode/
 
-# =========================
-# 环境配置 / 密钥
-# =========================
-.env                 # 环境变量文件
-.env.*               # 环境变量文件（dev/prod/staging 等）
-*.key                # 私钥文件
-*.pem                # 证书文件
-*.crt                # 证书文件
+# 环境变量 / 证书
+.env
+.env.*
+*.key
+*.pem
+*.crt
