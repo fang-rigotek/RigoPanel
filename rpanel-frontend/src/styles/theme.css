@@ -1,0 +1,19 @@
+:root{
+  --color-brand:#2563eb;
+  --color-bg:#f3f4f6;
+  --color-card:#ffffff;
+  --color-line:#e5e7eb;
+  --color-text:#111827;
+  --color-sub:#6b7280;
+  --radius-card:10px;
+}
+
+/* 可选：暗色主题
+.dark{
+  --color-bg:#1f2937;
+  --color-card:#374151;
+  --color-line:#4b5563;
+  --color-text:#f9fafb;
+  --color-sub:#9ca3af;
+}
+*/

@@ -1,14 +1,20 @@
 import { defineConfig } from 'vite';
 import preact from '@preact/preset-vite';
+import UnoCSS from 'unocss/vite';
 
-// Vite 配置文件
 export default defineConfig({
-  plugins: [preact()],
+  plugins: [
+    preact(),
+    UnoCSS(),
+  ],
   server: {
-    host: '0.0.0.0',      // 允许外部访问
+    host: '0.0.0.0',
     port: 5173,
-    strictPort: true,     // 端口被占用时直接报错，不会自动换
-    allowedHosts: ['betadevelop.com'], // 允许用这个域名访问
+    strictPort: true,
+    allowedHosts: ['betadevelop.com'],
+    proxy: {
+      // 仅开发期便捷；正式走 Nginx 同域反代
+      '/api': { target: 'http://127.0.0.1:8080', changeOrigin: true },
+    },
   },
-});
-
+}); 

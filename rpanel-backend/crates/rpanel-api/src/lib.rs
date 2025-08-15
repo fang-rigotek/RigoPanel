@@ -1,30 +1,23 @@
 //! rpanel-api
-//! - 提供 HTTP 服务，暴露 JSON API。
-//! - 与核心的 SnapshotStore 解耦，只负责把当前快照返回给前端。
+//! 提供 Axum Router：/api/v1/metrics/summary
 
-use axum::{extract::State, http::Method, routing::get, Json, Router};
-use rpanel_core::{MetricsSummary, SnapshotStore};
-use tower_http::cors::{Any, CorsLayer};
+#![deny(unused_imports, unused_must_use)]
+#![forbid(unsafe_code)]
+
+use axum::{routing::get, Router};
+use rpanel_core::SnapshotStore;
 
 #[derive(Clone)]
 pub struct ApiState {
     pub store: SnapshotStore,
 }
 
-pub fn app(state: ApiState) -> Router {
-    // CORS：允许前端 dev 源访问（5173）
-    // 生产可改为具体域名与 HTTPS
-    let cors = CorsLayer::new()
-        .allow_origin(Any) // 开发阶段先放开，生产建议收紧
-        .allow_methods([Method::GET])
-        .allow_headers(Any);
-
+pub fn build_router(state: ApiState) -> Router {
     Router::new()
-        .route("/api/v1/metrics/summary", get(get_summary))
+        .route("/api/v1/metrics/summary", get(summary))
         .with_state(state)
-        .layer(cors)
 }
 
-async fn get_summary(State(state): State<ApiState>) -> Json<MetricsSummary> {
-    Json(state.store.get())
+async fn summary(axum::extract::State(state): axum::extract::State<ApiState>) -> axum::Json<rpanel_core::MetricsSummary> {
+    axum::Json(state.store.get())
 }

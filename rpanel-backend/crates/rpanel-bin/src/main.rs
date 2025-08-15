@@ -1,55 +1,47 @@
-use rpanel_api::{app, ApiState};
-use rpanel_collector_sys::SysCollector;
-use rpanel_core::{Collector, SnapshotStore};
-use std::net::SocketAddr;
-use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
-use tokio_util::sync::CancellationToken; // ← 新增
+//! rpanel-bin
+//! 组装：配置 + 采集器 + HTTP 服务
+
+#![deny(unused_imports, unused_must_use)]
+#![forbid(unsafe_code)]
+
+mod config;
+mod collector;
+mod server;
+
+use axum::Router;
+use rpanel_api::{build_router, ApiState};
+use rpanel_core::SnapshotStore;
+use tracing::{info, Level};
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // 日志初始化（同前）
-    tracing_subscriber::registry()
-        .with(tracing_subscriber::EnvFilter::new(
-            std::env::var("RUST_LOG").unwrap_or_else(|_| "info,tower_http=info".into()),
-        ))
-        .with(tracing_subscriber::fmt::layer())
+    // 日志
+    tracing_subscriber::fmt()
+        .with_max_level(Level::INFO)
+        .with_target(false)
+        .compact()
         .init();
 
+    // 配置
+    let cfg = config::load();
+
+    // 共享快照
     let store = SnapshotStore::new();
 
-    // 采集器取消令牌集合（平台可统一停止）
-    let cancel = CancellationToken::new();
-    let mut _handles = Vec::new();
+    // 启动采集器（内部已正确装箱）
+    let (cancel, handle) = collector::start_collector(store.clone());
 
-    // 注册系统采集器
-    let sys = SysCollector::new();
-    _handles.push(Box::new(sys).spawn(store.clone(), cancel.child_token()));
-
-    // HTTP API
+    // HTTP 路由
     let state = ApiState { store };
-    let app = app(state);
+    let app: Router = build_router(state);
 
-    let host = std::env::var("RPANEL_HOST").unwrap_or_else(|_| "0.0.0.0".into());
-    let port: u16 = std::env::var("RPANEL_PORT").ok().and_then(|s| s.parse().ok()).unwrap_or(8080);
-    let addr: SocketAddr = format!("{}:{}", host, port).parse().unwrap();
+    // 启动服务器（Ctrl-C 优雅退出）
+    server::serve(cfg.addr, app).await?;
 
-    tracing::info!("rpanel API listening on http://{}", addr);
-
-    // 优雅退出：当 serve 返回（出错或被关闭）后，取消所有采集器
-    let res = axum::serve(
-        tokio::net::TcpListener::bind(addr).await?,
-        app.into_make_service_with_connect_info::<SocketAddr>(),
-    )
-    .await;
-
-    // 触发取消
+    // 关闭采集器
     cancel.cancel();
+    collector::join_with_timeout(handle, std::time::Duration::from_secs(1)).await;
 
-    // 结束：可等待所有采集器完成（可选）
-    for h in _handles {
-        let _ = h.abort(); // 简化处理：直接 abort；也可以改成等待 join
-    }
-
-    res?;
+    info!("RPanel shutdown complete.");
     Ok(())
 }
