@@ -1,0 +1,16 @@
+[package]
+name = "rpanel"
+version = "0.1.0"
+edition = "2024"
+license.workspace = true
+
+[dependencies]
+rpanel-core = { path = "../rpanel-core" }
+rpanel-collector-sys = { path = "../rpanel-collector-sys" }
+rpanel-api = { path = "../rpanel-api" }
+tokio.workspace = true
+tokio-util.workspace = true
+axum.workspace = true
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+anyhow = "1"

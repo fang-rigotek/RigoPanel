@@ -1,0 +1,14 @@
+[package]
+name = "rpanel-collector-sys"
+version = "0.1.0"
+edition = "2024"
+license.workspace = true
+
+[dependencies]
+rpanel-core = { path = "../rpanel-core" }
+serde.workspace = true
+thiserror.workspace = true
+tokio.workspace = true
+tokio-util.workspace = true     # ← 加上这个
+parking_lot.workspace = true
+rustix.workspace = true

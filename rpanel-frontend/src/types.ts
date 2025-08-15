@@ -1,0 +1,30 @@
+// 定义前端展示所需的基础类型，后端以后返回的 JSON 会尽量与这里保持一致
+export interface CpuSummary {
+  usagePercent: number;     // CPU 使用率（0~100）
+}
+
+export interface MemorySummary {
+  totalBytes: number;       // 总内存（字节）
+  usedBytes: number;        // 已用内存（字节）
+}
+
+export interface DiskSummary {
+  mount: string;            // 挂载点（例如 "/"）
+  totalBytes: number;       // 总空间（字节）
+  usedBytes: number;        // 已用空间（字节）
+}
+
+export interface NetIfStat {
+  iface: string;            // 网卡名（例如 "eth0"）
+  rxBps: number;            // 下行速率（bit/s）
+  txBps: number;            // 上行速率（bit/s）
+  linkMbps?: number;        // 物理/虚拟链路速率（Mbps，可选）
+}
+
+export interface MetricsSummary {
+  cpu: CpuSummary;
+  memory: MemorySummary;
+  disk: DiskSummary;
+  net: NetIfStat[];         // 允许多网卡
+  ts: number;               // 时间戳（毫秒），方便前端做序列化展示
+}

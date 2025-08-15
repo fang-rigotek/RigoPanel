@@ -1,0 +1,14 @@
+[package]
+name = "rpanel-api"
+version = "0.1.0"
+edition = "2024"
+license.workspace = true
+
+[dependencies]
+rpanel-core = { path = "../rpanel-core" }
+axum.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+serde.workspace = true
+serde_json.workspace = true

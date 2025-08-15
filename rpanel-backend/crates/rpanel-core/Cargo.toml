@@ -1,0 +1,12 @@
+[package]
+name = "rpanel-core"
+version = "0.1.0"
+edition = "2024"           # ← 明确使用 2024 Edition
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+thiserror.workspace = true
+parking_lot.workspace = true
+tokio.workspace = true      # ← 新增：为了返回 JoinHandle，需要引用 tokio 的类型
+tokio-util.workspace = true   # ← 新增：取消令牌
